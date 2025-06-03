@@ -30,12 +30,12 @@ public class PedidoService {
     private OrganizacaoRepository organizacaoRepository;
 
     public PedidoResponseDTO create(PedidoRequestDTO dto, Usuario usuario) {
-        if (usuario.getRole() != RoleUsuario.ADMIN) {
-            throw new AccessDeniedException("Somente admins podem criar pedidos.");
+        if (usuario == null) {
+            throw new AccessDeniedException("Usuário não autenticado.");
         }
 
         Organizacao org = organizacaoRepository.findById(dto.organizacaoId())
-                .orElseThrow(() -> new EntityNotFoundException("Organizacao nao encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Organização não encontrada."));
 
         Pedido pedido = PedidoMapper.toEntity(dto, org);
         Pedido salvo = pedidoRepository.save(pedido);
@@ -43,15 +43,15 @@ public class PedidoService {
     }
 
     public PedidoResponseDTO update(Long id, PedidoUpdateDTO dto, Usuario usuario) {
-        if (usuario.getRole() != RoleUsuario.ADMIN) {
-            throw new AccessDeniedException("Somente admins podem atualizar pedidos.");
+        if (usuario == null) {
+            throw new AccessDeniedException("Usuário não autenticado.");
         }
 
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pedido nao encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado."));
 
         Organizacao org = organizacaoRepository.findById(dto.organizacaoId())
-                .orElseThrow(() -> new EntityNotFoundException("Organizacao nao encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Organização não encontrada."));
 
         PedidoMapper.updateEntity(pedido, dto, org);
         Pedido atualizado = pedidoRepository.save(pedido);
@@ -59,29 +59,33 @@ public class PedidoService {
     }
 
     public void delete(Long id, Usuario usuario) {
-        if (usuario.getRole() != RoleUsuario.ADMIN) {
-            throw new AccessDeniedException("Somente admins podem deletar pedidos.");
+        if (usuario == null) {
+            throw new AccessDeniedException("Usuário não autenticado.");
         }
 
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pedido nao encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado."));
 
         pedidoRepository.delete(pedido);
     }
 
     public PedidoResponseDTO getById(Long id, Usuario usuario) {
+
+        if (usuario == null) {
+            throw new AccessDeniedException("Usuário não autenticado.");
+        }
+
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pedido nao encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado."));
         return PedidoMapper.toDTO(pedido);
     }
 
     public Page<PedidoResponseDTO> listAll(Pageable pageable, Usuario usuario, PedidoFilter filter) {
         if (usuario == null) {
-            throw new AccessDeniedException("Usuário não autenticado");
+            throw new AccessDeniedException("Usuário não autenticado.");
         }
 
         Specification<Pedido> spec = PedidoSpecification.withFilters(filter);
-
         Page<Pedido> pedidos = pedidoRepository.findAll(spec, pageable);
         return pedidos.map(PedidoMapper::toDTO);
     }
