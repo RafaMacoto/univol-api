@@ -68,14 +68,14 @@ URL: https://conectavoluntario-ml-api.onrender.com/classificar
 
 ## Funcionalidades
 
-Cadastro automático de pedidos com classificação de prioridade via API de IA
+- Cadastro automático de pedidos com classificação de prioridade via API de IA
 
-Armazenamento do resultado da classificação
+- Armazenamento do resultado da classificação
 
-Consulta de logs de classificação
+- Consulta de logs de classificação
 
-Filtros dinâmicos para buscar pedidos por parâmetros variados
+- Filtros dinâmicos para buscar pedidos por parâmetros variados
 
-Associação de pedidos a organizações e usuários
+- Associação de pedidos a organizações e usuários
 
-Preparação para autenticação e controle de acesso
+- Preparação para autenticação e controle de acesso
