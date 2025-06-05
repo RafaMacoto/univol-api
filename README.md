@@ -3,10 +3,6 @@
 ## Descrição do Projeto
 Este projeto propõe uma solução inteligente para a gestão de pedidos de organizações voluntárias, automatizando a classificação de prioridade dos pedidos com base no conteúdo da descrição. Utiliza-se uma API de Machine Learning externa para realizar a avaliação, salvando tanto a prioridade no próprio pedido quanto o histórico dessa classificação em uma tabela de log.
 
-## Problema
-- Classificação manual dos pedidos gera inconsistências e falta de critérios claros.
-- A ausência de um histórico de decisões dificulta auditorias e melhorias.
-- Crescimento da operação exige escalabilidade e automação no processo.
 
 ## Solução
 - Ao cadastrar um novo pedido, sua descrição é enviada automaticamente a uma API de Machine Learning.
@@ -68,21 +64,11 @@ docker run -p 8080:8080 univol-backend
 Integração com API de Machine Learning
 URL: https://conectavoluntario-ml-api.onrender.com/classificar
 
-Método: POST
-
-Corpo da requisição:
-
-{
-  "texto": "descrição do pedido"
-}
-Resposta esperada:
-
-{
-  "prioridade": "alta"
-}
+```
 
 
 ## Funcionalidades
+
 Cadastro automático de pedidos com classificação de prioridade via API de IA
 
 Armazenamento do resultado da classificação
