@@ -49,6 +49,7 @@ Este projeto propõe uma solução inteligente para a gestão de pedidos de orga
 
 ### Executando Localmente com Maven
 ```bash
+
 git clone https://github.com/RafaMacoto/univol-backend.git
 cd univol-backend
 ./mvnw spring-boot:run
@@ -56,9 +57,7 @@ Acesse a aplicação em:
 http://localhost:8080
 
 Executando com Docker
-bash
-Copiar
-Editar
+
 docker build -t univol-backend .
 docker run -p 8080:8080 univol-backend
 Integração com API de Machine Learning
