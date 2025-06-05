@@ -6,7 +6,6 @@ import com.univol.model.StatusPedido;
 public record PedidoRequestDTO(
 
         String descricao,
-        Prioridade prioridade,
         StatusPedido status,
         Long organizacaoId
 ) {

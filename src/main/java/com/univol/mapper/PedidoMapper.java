@@ -13,7 +13,6 @@ public class PedidoMapper {
     public static Pedido toEntity(PedidoRequestDTO dto, Organizacao organizacao) {
         Pedido pedido = new Pedido();
         pedido.setDescricao(dto.descricao());
-        pedido.setPrioridade(dto.prioridade());
         pedido.setStatus(dto.status());
         pedido.setOrganizacao(organizacao);
         return pedido;

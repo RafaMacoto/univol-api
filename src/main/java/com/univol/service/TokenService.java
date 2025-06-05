@@ -23,12 +23,11 @@ public class TokenService {
         var jwt = JWT.create()
                 .withSubject(user.getId().toString())
                 .withClaim("email", user.getEmail())
+                .withClaim("role", user.getRole().name())
                 .withExpiresAt(expiresAt)
                 .sign(algorithm);
 
         return new Token(jwt, user.getEmail());
-
-
     }
 
     public Usuario getUserFromToken(String jwt) {

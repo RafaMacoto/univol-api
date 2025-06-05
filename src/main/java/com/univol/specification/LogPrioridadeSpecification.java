@@ -18,16 +18,6 @@ public class LogPrioridadeSpecification {
                 predicates.add(cb.equal(root.get("pedido").get("id"), filter.idPedido()));
             }
 
-            if (filter.prioridadeClassificada() != null && !filter.prioridadeClassificada().isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("prioridadeClassificada")),
-                        "%" + filter.prioridadeClassificada().toLowerCase() + "%"));
-            }
-
-            if (filter.modeloMl() != null && !filter.modeloMl().isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("modeloMl")),
-                        "%" + filter.modeloMl().toLowerCase() + "%"));
-            }
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

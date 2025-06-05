@@ -39,19 +39,6 @@ public class LogPrioridadeService {
         return LogPrioridadeMapper.toResponseDTO(log);
     }
 
-    public LogPrioridadeResponseDTO create(LogPrioridadeRequestDTO dto) {
-        Pedido pedido = pedidoRepository.findById(dto.pedidoId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado"));
-        LogPrioridade log = LogPrioridadeMapper.toEntity(dto, pedido);
-        repository.save(log);
-        return LogPrioridadeMapper.toResponseDTO(log);
-    }
-
-    public void delete(Long id) {
-        LogPrioridade log = getById(id);
-        repository.delete(log);
-    }
-
     private LogPrioridade getById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Log não encontrado"));

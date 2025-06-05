@@ -8,6 +8,7 @@ import com.univol.model.Organizacao;
 import com.univol.model.Usuario;
 import com.univol.repository.OrganizacaoRepository;
 import com.univol.specification.OrganizacaoSpecification;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @Service
 public class OrganizacaoService {
 
+    @Autowired
     private OrganizacaoRepository organizacaoRepository;
 
     public Page<OrganizacaoResponseDTO> listAll(Pageable pageable, Usuario usuario, OrganizacaoFilter filter) {
