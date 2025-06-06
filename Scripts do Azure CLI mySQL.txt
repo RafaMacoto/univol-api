@@ -1,0 +1,170 @@
+Login com a conta do azure
+az login
+
+
+Criar resource group
+az group create -l eastus -n rg-vm-global-solution
+
+
+Criar maquina virtual
+az vm create --resource-group rg-vm-global-solution --name vm-global-solution --image Canonical:ubuntu-24_04-lts:minimal:24.04.202505020 --size Standard_B2s --admin-username admin_fiap --admin-password admin_fiap@123
+
+
+
+Abrir as portas necessarias
+az network nsg rule create --resource-group rg-vm-global-solution --nsg-name vm-global-solutionNSG --name port_8080 --protocol tcp --priority 1010 --destination-port-range 8080
+
+az network nsg rule create --resource-group rg-vm-global-solution --nsg-name vm-global-solutionNSG --name port_80 --protocol tcp --priority 1020 --destination-port-range 80
+
+az network nsg rule create --resource-group rg-vm-global-solution --nsg-name vm-global-solutionNSG --name port_3306 --protocol tcp --priority 1030 --destination-port-range 3306
+
+No terminal da sua máquina local
+ssh admin_fiap@<IP-PÚBLICO-DA-VM>
+
+
+Instalar o Docker na vm
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+
+Instalar a última versão do Docker
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+
+Verificar se a instalação foi um sucesso
+sudo docker run hello-world
+
+
+# 1. Criar a rede docker compartilhada
+sudo docker network create global-solution-net
+
+
+Criar volume nomeado para persistência
+sudo docker volume create gs-mysql-data
+
+
+
+Subir o container do MySQL
+sudo docker run --name mysql-gs-db \
+  -e MYSQL_ROOT_PASSWORD=admin_fiap@123 \
+  -v gs-mysql-data:/var/lib/mysql \
+  --network global-solution-net \
+  -p 3306:3306 \
+  -d mysql/mysql-server:latest
+
+
+
+
+
+Acessar o container e conectar no MySQL
+sudo docker container exec -it mysql-gs-db bash
+
+
+Depois, dentro do container:
+Usuário root
+mysql -u root -p
+# senha: admin_fiap@123
+
+
+
+
+Criar banco, usuário e tabela de teste
+CREATE DATABASE bdfiap;
+
+CREATE USER 'fiap'@'%' IDENTIFIED BY 'admin_fiap@123';
+
+GRANT ALL ON bdfiap.* TO 'fiap'@'%';
+
+FLUSH PRIVILEGES;
+
+
+
+
+Saindo...
+exit  # sair do MySQL root
+
+
+
+
+Logar como usuário FIAP e criar tabela
+mysql -u fiap -p
+
+
+
+
+Agora dentro do MySQL no CMD mesmo:
+
+USE bdfiap;
+
+
+CREATE TABLE t_usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('USER', 'ADMIN')),
+
+    telefone VARCHAR(20),
+    localizacao VARCHAR(150),
+    habilidades VARCHAR(255)
+);
+
+CREATE TABLE t_organizacao (
+    id_organizacao INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('ONG', 'Prefeitura', 'Empresa', 'Outros')),
+    contato VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE t_pedido (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    descricao TEXT NOT NULL,
+    prioridade VARCHAR(20) CHECK (prioridade IN ('Alta', 'Media', 'Baixa')),
+    data_pedido DATE NOT NULL DEFAULT (CURRENT_DATE),
+    id_organizacao INT NOT NULL,
+    status VARCHAR(20) NOT NULL CHECK (status IN ('Aberto', 'Em andamento', 'Concluido')),
+    CONSTRAINT fk_pedido_organizacao FOREIGN KEY (id_organizacao) REFERENCES t_organizacao(id_organizacao)
+);
+
+CREATE TABLE t_voluntario (
+    id_voluntario INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    disponibilidade VARCHAR(100) NOT NULL,
+    CONSTRAINT fk_voluntario_usuario FOREIGN KEY (id_usuario) REFERENCES t_usuario(id),
+    CONSTRAINT unq_usuario_voluntario UNIQUE (id_usuario)
+);
+
+CREATE TABLE t_participacao (
+    id_participacao INT AUTO_INCREMENT PRIMARY KEY,
+    id_pedido INT NOT NULL,
+    id_voluntario INT NOT NULL,
+    data_participacao DATE NOT NULL DEFAULT (CURRENT_DATE),
+    CONSTRAINT fk_participacao_pedido FOREIGN KEY (id_pedido) REFERENCES t_pedido(id_pedido),
+    CONSTRAINT fk_participacao_voluntario FOREIGN KEY (id_voluntario) REFERENCES t_voluntario(id_voluntario),
+    CONSTRAINT unq_pedido_voluntario UNIQUE (id_pedido, id_voluntario)
+);
+
+CREATE TABLE t_log_prioridade (
+    id_log INT AUTO_INCREMENT PRIMARY KEY,
+    id_pedido INT NOT NULL,
+    prioridade_classificada VARCHAR(20) CHECK (prioridade_classificada IN ('Alta', 'Media', 'Baixa')),
+    modelo_ml VARCHAR(100) NOT NULL,
+    data_classificacao DATE NOT NULL DEFAULT (CURRENT_DATE),
+    CONSTRAINT fk_log_pedido FOREIGN KEY (id_pedido) REFERENCES t_pedido(id_pedido)
+);
+
+
+
+Verificar se o banco de dados esta aparecendo
+SHOW DATABASES;

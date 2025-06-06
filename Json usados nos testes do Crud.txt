@@ -1,0 +1,47 @@
+POST BIANCA http://<IP-PUBLICO-VM>:8080/users
+{
+  "nome": "Bianca Gamo",
+  "email": "bianca.gamo@gmail.com",
+  "telefone": "11999999",
+  "role": "ADMIN",
+  "senha": "senhaSegura123",
+  "localizacao": "São Paulo - SP",
+  "habilidades": ["Primeiros Socorros", "Organização de Eventos"]
+}
+
+
+POST Gabrielly http://<IP-PUBLICO-VM>:8080/users
+{
+  "nome": "Gabrielly Macedo",
+  "email": "gabrielly.macedo@gmail.com",
+  "telefone": "1198999797",
+  "role": "ADMIN",
+  "senha": "senhaSegura123",
+  "localizacao": "São Paulo - SP",
+  "habilidades": ["Primeiros Socorros", "Organização de Eventos"]
+}
+
+
+
+POST LOGIN http://<IP-PUBLICO-VM>:8080/login
+{
+"email": "bianca.gamo@gmail.com",
+"password": "senhaSegura123"
+}
+
+
+PUT BIANCA http://<IP-PUBLICO-VM>:8080/users/{id}
+{
+  "nome": "Bianca Gamo",
+  "email": "bianca.gamo@gmail.com",
+  "telefone": "927492792",
+  "role": "ADMIN",
+  "senha": "senhaSegura123",
+  "localizacao": "São Paulo - SP",
+  "habilidades": ["Primeiros Socorros", "Organização de Eventos"]
+}
+
+
+DELETE http://<IP-PUBLICO-VM>:8080/users/{id}
+
+GET USERS http://<IP-PUBLICO-VM>:8080/users

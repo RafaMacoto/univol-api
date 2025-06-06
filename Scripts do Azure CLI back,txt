@@ -1,0 +1,118 @@
+Abrir o vs code, criar uma pasta e clonar o repositório la dentro
+git clone https://github.com/RafaMacoto/univol-api.git
+
+Entrar na pasta do projeto
+cd univol-api
+
+Ir no properties e colocar isso
+spring.application.name=univol
+
+spring.datasource.url=jdbc:mysql://mysql-gs-db:3306/bdfiap
+spring.datasource.username=fiap
+spring.datasource.password=admin_fiap@123
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+
+server.error.include-stacktrace=never
+
+
+E adicione isso no pom.xml
+
+<dependency>
+  <groupId>mysql</groupId>
+  <artifactId>mysql-connector-java</artifactId>
+  <version>8.0.33</version>
+</dependency>
+
+
+Criar o arquivo Dockerfile na raiz do projeto
+# Etapa de build com Java 21
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+
+WORKDIR /app
+
+# Copia os arquivos do projeto para o container
+COPY . .
+
+# Compila e empacota a aplicação sem rodar os testes
+RUN mvn clean package -DskipTests
+
+# Etapa de runtime com Java 21
+FROM eclipse-temurin:21-jre-jammy
+
+# Cria um usuário não-root para rodar a aplicação
+RUN useradd -m appuser
+
+WORKDIR /home/appuser
+
+# Copia o .jar gerado na etapa de build
+COPY --from=build /app/target/*.jar app.jar
+
+# Define o usuário não-root
+USER appuser
+
+# Exponha a porta que sua aplicação utiliza
+EXPOSE 8080
+
+# Comando para executar a aplicação
+CMD ["java", "-jar", "app.jar"]
+
+
+
+Build da imagem localmente
+docker build -t rm558962/global-solution:1.0 .
+
+
+
+Vamos subir a imagem na nuvem
+
+Login no Docker Hub
+docker login
+
+
+Tag da imagem com seu Docker Hub
+docker tag rm558962/global-solution rm558962/global-solution:1.0
+
+
+Push para o Docker Hub
+docker push rm558962/global-solution:1.0
+
+
+
+Na VM (depois de logado via SSH)
+sudo docker pull rm558962/global-solution:1.0
+sudo docker run -d --name backend-gs --network global-solution-net -p 8080:8080 rm558962/global-solution:1.0
+
+
+
+Acessar a aplicação no Insomnia
+http://<IP-PÚBLICO-DA-VM>:8080
+
+Fazer as requisições
+
+Ir no mysql, ajustar para a ip publico da vm
+
+Usar ele
+USE bdfiap;
+
+
+Mostrar as tabelas criadas
+SHOW TABLES;
+
+
+Mostrar algumas tabelas
+SELECT * FROM tabela;
+
+Depois para ver os logs do back e do banco
+
+Verificar se container está rodando corretamente
+exit até chegar na vm
+sudo docker ps
+
+Back logs
+sudo docker logs backend-gs
+
+Banco logs
+sudo docker logs mysql-gs-db
